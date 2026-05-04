@@ -8,6 +8,7 @@ import urllib.request
 import traceback
 
 from fastapi import FastAPI, HTTPException, BackgroundTasks
+from fastapi.concurrency import run_in_threadpool
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse, Response, StreamingResponse
@@ -749,6 +750,28 @@ async def favicon():
     raise HTTPException(status_code=404, detail="Favicon not found")
 
 
+@app.get("/favicon.png")
+async def favicon_png():
+    icon = os.path.join(frontend_path, "favicon.png")
+    if os.path.exists(icon):
+        return FileResponse(icon, media_type="image/png")
+    fallback = os.path.join(frontend_path, "logo.png")
+    if os.path.exists(fallback):
+        return FileResponse(fallback, media_type="image/png")
+    raise HTTPException(status_code=404, detail="Favicon not found")
+
+
+@app.get("/apple-touch-icon.png")
+async def apple_touch_icon():
+    icon = os.path.join(frontend_path, "favicon.png")
+    if os.path.exists(icon):
+        return FileResponse(icon, media_type="image/png")
+    fallback = os.path.join(frontend_path, "logo.png")
+    if os.path.exists(fallback):
+        return FileResponse(fallback, media_type="image/png")
+    raise HTTPException(status_code=404, detail="Apple touch icon not found")
+
+
 @app.get("/api/health")
 async def health():
     return {"status": "healthy", "model": CHAT_MODEL}
@@ -759,6 +782,35 @@ async def tts(req: TTSRequest, background_tasks: BackgroundTasks):
     text = (req.text or "").strip()
     if not text:
         raise HTTPException(status_code=400, detail="text is required")
+
+    local_tts_url = os.getenv("MINDBUDDHI_TTS_URL", "http://127.0.0.1:8020/api/tts").strip()
+    if local_tts_url:
+        payload = json.dumps(
+            {
+                "text": text[:220],
+                "voice": req.voice or "buddi",
+                "language": (req.language or "ko")[:2],
+            }
+        ).encode("utf-8")
+        request = urllib.request.Request(
+            local_tts_url,
+            data=payload,
+            headers={"Content-Type": "application/json"},
+            method="POST",
+        )
+        try:
+            def fetch_local_tts():
+                with urllib.request.urlopen(request, timeout=90) as response:
+                    return response.read(), response.headers.get("Content-Type", "audio/wav")
+
+            audio_bytes, content_type = await run_in_threadpool(fetch_local_tts)
+            return Response(
+                content=audio_bytes,
+                media_type=content_type or "audio/wav",
+                headers={"Content-Disposition": 'inline; filename="mindbuddhi_buddi.wav"'},
+            )
+        except Exception as exc:
+            logger.warning("Local TTS server unavailable, falling back to one-shot XTTS: %s", exc)
 
     tts_python = os.getenv(
         "MINDBUDDHI_TTS_PYTHON",

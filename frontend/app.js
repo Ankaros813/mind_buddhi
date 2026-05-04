@@ -31,7 +31,7 @@ const i18n = {
         saju: "사주 명리",
         infoTitle: "🪷 상담 안내",
         infoText: "중아함경 등 팔만대장경의 지혜를 바탕으로 마음의 안정과 위로를 드립니다.",
-        voiceBtn: "🎙️ 음성 기능 준비 중",
+        voiceBtn: "음성 기능 (실험용)",
         sutrasBadge: "📖 팔만대장경 지혜 상담",
         statusReady: "상담 준비 완료",
         inputPlaceholder: "마음속의 이야기를 적어주세요…",
@@ -80,7 +80,7 @@ const i18n = {
         saju: "Saju Astrology",
         infoTitle: "🪷 Guidance",
         infoText: "Providing comfort and peace of mind through the wisdom of the Tripitaka.",
-        voiceBtn: "🎙️ Voice coming soon",
+        voiceBtn: "Voice feature (Experimental)",
         sutrasBadge: "📖 Wisdom Counseling",
         statusReady: "Ready to listen",
         inputPlaceholder: "Share the story in your mind...",
@@ -439,7 +439,9 @@ function closeSetupModal() {
     }
     // Set a flag in localStorage so it doesn't show again
     localStorage.setItem('mindbuddi-setup-done', 'true');
-    userInput.focus();
+    if (!isSmallViewport()) {
+        userInput.focus();
+    }
 }
 
 function updateStartButtonState() {
@@ -590,14 +592,18 @@ function appendBotMessage(answer, sources, images) {
 
     const voiceText = extractFirstAnswerSection(answer);
     const voiceLabel = currentLang === 'en' ? 'Play voice' : '\uc74c\uc131 \ucd9c\ub825';
+    const voiceHint = currentLang === 'en' ? 'Try voice playback' : '\uc74c\uc131 \uae30\ub2a5\ub3c4 \uc774\uc6a9\ud574 \ubcf4\uc138\uc694!';
     const voiceHtml = voiceText
-        ? `<button class="voice-output-btn" type="button" data-voice-text="${escapeAttr(voiceText)}" onclick="playAnswerVoice(this)" title="${voiceLabel}" aria-label="${voiceLabel}">
+        ? `<div class="voice-output-wrap">
+          <span class="voice-output-hint">${voiceHint}</span>
+          <button class="voice-output-btn" type="button" data-voice-text="${escapeAttr(voiceText)}" onclick="playAnswerVoice(this)" title="${voiceLabel}" aria-label="${voiceLabel}">
             <svg class="voice-ring" viewBox="0 0 36 36" aria-hidden="true">
               <circle class="voice-ring-track" cx="18" cy="18" r="15.5"></circle>
               <circle class="voice-ring-progress" cx="18" cy="18" r="15.5"></circle>
             </svg>
             <span class="voice-icon">🎙️</span>
-          </button>`
+          </button>
+        </div>`
         : '';
 
     // Feedback
@@ -647,7 +653,7 @@ function extractFirstAnswerSection(answer) {
         .replace(/\[[^\]]+\]\([^)]+\)/g, '')
         .replace(/\s+/g, ' ')
         .trim()
-        .slice(0, 700);
+        .slice(0, 120);
 }
 
 async function playAnswerVoice(btn) {
@@ -734,7 +740,7 @@ async function playAnswerVoice(btn) {
 
 function startVoiceProgress(btn, text) {
     stopVoiceProgress(btn);
-    const estimatedMs = Math.min(45000, Math.max(14000, (text || '').length * 85));
+    const estimatedMs = Math.min(9000, Math.max(2600, (text || '').length * 35));
     const startedAt = Date.now();
     btn.style.setProperty('--voice-progress', '0deg');
     activeVoiceProgressTimer = setInterval(() => {
