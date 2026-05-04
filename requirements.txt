@@ -1,0 +1,5 @@
+fastapi
+python-dotenv
+supabase>=2.0.0
+openai
+    

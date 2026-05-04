@@ -1,0 +1,13 @@
+{
+	"folders": [
+		{
+			"path": "../.."
+		},
+		{
+			"path": "../../../Downloads/mindbuddi_clean_export_v2"
+		}
+	],
+	"settings": {
+		"git.ignoreLimitWarning": true
+	}
+}

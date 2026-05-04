@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MindBuddi Image UI Kit (Standalone)</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Noto+Serif+KR:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    /* ── 디자인 시스템 변수 ── */
+    :root {
+      --primary: #d5c2ed;
+      --primary-dark: #9a7bc4;
+      --primary-darker: #5a4a8a;
+      --bg-white: #ffffff;
+      --bg-light: #f3f1f9;
+      --text-primary: #2d2d2d;
+      --text-secondary: #555555;
+      --text-muted: #8e8e93;
+      --border: rgba(0, 0, 0, 0.08);
+      --shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+      --transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    body {
+      padding: 40px;
+      margin: 0;
+      font-family: 'Inter', -apple-system, sans-serif;
+      background-color: var(--bg-light);
+      color: var(--text-primary);
+    }
+
+    h1 {
+      font-family: 'Noto Serif KR', serif;
+      margin-bottom: 30px;
+    }
+
+    /* ── 이미지 카드 갤러리 ── */
+    .images-gallery {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+      gap: 16px;
+      margin-bottom: 40px;
+    }
+
+    .img-card {
+      background: var(--bg-white);
+      border-radius: 16px;
+      overflow: hidden;
+      border: 1px solid var(--border);
+      cursor: pointer;
+      box-shadow: var(--shadow);
+      transition: var(--transition);
+    }
+
+    .img-card:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 15px 35px rgba(213, 194, 237, 0.3);
+      border-color: var(--primary);
+    }
+
+    .img-card img {
+      width: 100%;
+      aspect-ratio: 1;
+      object-fit: cover;
+      display: block;
+    }
+
+    .img-label {
+      padding: 12px;
+      font-size: 14px;
+      font-weight: 600;
+      text-align: center;
+      color: var(--text-secondary);
+      background: #faf8ff;
+      border-top: 1px solid var(--border);
+    }
+
+    .img-hint {
+      font-size: 13px;
+      color: var(--text-muted);
+      margin-top: 8px;
+    }
+
+    /* ── 듀얼 모드 모달 (Dual Modal) ── */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(255, 255, 255, 0.85);
+      backdrop-filter: blur(8px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.3s ease;
+    }
+
+    .modal-overlay.active {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .modal-content {
+      max-width: 800px;
+      width: 90vw;
+      max-height: 85vh;
+      border-radius: 24px;
+      background: var(--bg-white);
+      box-shadow: 0 30px 80px rgba(0, 0, 0, 0.15);
+      border: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      transform: scale(0.95);
+      transition: transform 0.3s ease;
+    }
+
+    .modal-overlay.active .modal-content {
+      transform: scale(1);
+    }
+
+    /* 모달 헤더 탭 */
+    .modal-header-tabs {
+      display: flex;
+      background: #f8f9fa;
+      border-bottom: 1px solid var(--border);
+      padding: 0 10px;
+    }
+
+    .modal-tab-btn {
+      padding: 20px 28px;
+      background: none;
+      border: none;
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--text-muted);
+      cursor: pointer;
+      border-bottom: 3px solid transparent;
+      transition: var(--transition);
+      font-family: inherit;
+    }
+
+    .modal-tab-btn.active {
+      color: var(--primary-darker);
+      border-bottom-color: var(--primary);
+    }
+
+    .modal-body-content {
+      flex: 1;
+      overflow-y: auto;
+      min-height: 400px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: white;
+    }
+
+    /* 해석 뷰 (텍스트) */
+    .modal-view-text {
+      padding: 60px 40px;
+      width: 100%;
+      max-width: 650px;
+      text-align: center;
+      animation: fadeSlideIn 0.4s ease;
+    }
+
+    .trans-header {
+      margin-bottom: 30px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .trans-icon { font-size: 40px; }
+
+    .trans-title {
+      font-family: 'Noto Serif KR', serif;
+      font-size: 24px;
+      color: var(--primary-darker);
+      margin-bottom: 12px;
+      letter-spacing: -0.5px;
+    }
+
+    .trans-text {
+      font-size: 19px;
+      line-height: 2.1;
+      color: var(--text-primary);
+      font-weight: 400;
+      word-break: keep-all;
+    }
+
+    /* 이미지 뷰 */
+    .modal-view-image {
+      padding: 30px;
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      animation: fadeSlideIn 0.4s ease;
+      width: 100%;
+    }
+
+    .modal-image-caption {
+      max-width: 650px;
+      width: 100%;
+      text-align: center;
+      margin-top: 24px;
+    }
+
+    .modal-view-image img {
+      max-width: 100%;
+      max-height: 50vh;
+      object-fit: contain;
+      border-radius: 12px;
+      box-shadow: 0 10px 40px rgba(213, 194, 237, 0.25);
+    }
+
+    @keyframes fadeSlideIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .modal-close {
+      position: absolute;
+      top: 15px;
+      right: 15px;
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: rgba(0, 0, 0, 0.05);
+      border: none;
+      color: var(--text-secondary);
+      font-size: 20px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .modal-close:hover { background: rgba(0,0,0,0.1); }
+  </style>
+</head>
+<body>
+
+  <h1>📖 MindBuddi UI 데모</h1>
+  <p>이미지 카드를 클릭하여 <strong>'해석 우선 모달'</strong>를 확인해 보세요.</p>
+
+  <div class="images-gallery">
+    <!-- 카드 1 -->
+    <div class="img-card" 
+         onclick="showModal('https://images.unsplash.com/photo-1544947950-fa07b48696b9?auto=format&fit=crop&w=400&q=80', '팔만대장경 구절 #1', '이 구절은 마음의 평화를 찾는 것이 모든 지혜의 시작임을 알려줍니다. 외부의 소음보다 내면의 고요함에 집중할 때, 우리는 비로소 진정한 자유를 얻을 수 있습니다.')">
+      <img src="https://images.unsplash.com/photo-1544947950-fa07b48696b9?auto=format&fit=crop&w=400&q=80" alt="Sutra 1">
+      <div class="img-label">평온의 가르침</div>
+    </div>
+
+    <!-- 카드 2 -->
+    <div class="img-card" 
+         onclick="showModal('https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=400&q=80', '팔만대장경 구절 #2', '바다와 같은 마음으로 모든 생명을 포용하세요. 파도는 일어나고 사라지지만 바다 자체는 변함이 없듯이, 우리의 실상 또한 어떠한 풍파에도 흔들리지 않는 법입니다.')">
+      <img src="https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=400&q=80" alt="Sutra 2">
+      <div class="img-label">포용의 마음</div>
+    </div>
+  </div>
+
+  <div class="img-hint">💡 사진을 클릭하면 팔만대장경 기반의 해석을 먼저 볼 수 있습니다.</div>
+
+  <!-- 모달 구조 -->
+  <div id="modalOverlay" class="modal-overlay" onclick="handleOverlayClick(event)">
+    <div class="modal-content">
+      <div class="modal-header-tabs">
+        <button id="btnText" class="modal-tab-btn active" onclick="switchTab('text')">📖 경전 해석</button>
+        <button id="btnImage" class="modal-tab-btn" onclick="switchTab('image')">🖼 원본 카드</button>
+      </div>
+      
+      <div class="modal-body-content">
+        <div id="viewText" class="modal-view-text">
+          <div class="trans-header">
+            <span class="trans-icon">📜</span>
+            <h3 id="modalTitle" class="trans-title">마음의 지혜 (해석)</h3>
+          </div>
+          <p id="modalText" class="trans-text"></p>
+        </div>
+        
+        <div id="viewImage" class="modal-view-image">
+          <img id="modalImg" src="" alt="">
+          <div class="modal-image-caption">
+            <p id="modalSideText" class="trans-text" style="font-size: 16px;"></p>
+            <p style="margin-top:16px; color:var(--text-muted); font-size:12px; border-top: 1px solid var(--border); padding-top: 12px;">※ 팔만대장경 원본 카드와 해석입니다.</p>
+          </div>
+        </div>
+      </div>
+      
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+  </div>
+
+  <script>
+    function showModal(url, title, text) {
+      document.getElementById('modalImg').src = url;
+      document.getElementById('modalText').innerText = text;
+      document.getElementById('modalSideText').innerText = text; // 추가된 사진 밑 글자
+      document.getElementById('modalOverlay').classList.add('active');
+      switchTab('text'); // 무조건 해석 탭 우선
+    }
+
+    function closeModal() {
+      document.getElementById('modalOverlay').classList.remove('active');
+    }
+
+    function handleOverlayClick(e) {
+      if (e.target.id === 'modalOverlay') closeModal();
+    }
+
+    function switchTab(type) {
+      const vText = document.getElementById('viewText');
+      const vImage = document.getElementById('viewImage');
+      const bText = document.getElementById('btnText');
+      const bImage = document.getElementById('btnImage');
+
+      if (type === 'text') {
+        vText.style.display = 'block';
+        vImage.style.display = 'none';
+        bText.classList.add('active');
+        bImage.classList.remove('active');
+      } else {
+        vText.style.display = 'none';
+        vImage.style.display = 'flex';
+        bText.classList.remove('active');
+        bImage.classList.add('active');
+      }
+    }
+
+    // ESC 키로 닫기
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') closeModal();
+    });
+  </script>
+</body>
+</html>

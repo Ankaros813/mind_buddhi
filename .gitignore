@@ -1,0 +1,9 @@
+.env
+.env.local
+__pycache__/
+*.py[cod]
+*.log
+.vercel/
+.pytest_cache/
+.mypy_cache/
+node_modules/
