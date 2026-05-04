@@ -744,9 +744,12 @@ async def mobile_page():
 
 @app.get("/favicon.ico")
 async def favicon():
-    icon = os.path.join(frontend_path, "logo.png")
+    icon = os.path.join(frontend_path, "favicon.ico")
     if os.path.exists(icon):
-        return FileResponse(icon, media_type="image/png")
+        return FileResponse(icon, media_type="image/x-icon")
+    fallback = os.path.join(frontend_path, "logo.png")
+    if os.path.exists(fallback):
+        return FileResponse(fallback, media_type="image/png")
     raise HTTPException(status_code=404, detail="Favicon not found")
 
 
