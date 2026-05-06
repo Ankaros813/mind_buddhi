@@ -17,6 +17,7 @@ let currentProfile = {
 let currentVoice = localStorage.getItem('mindbuddi_voice') || 'buddi';
 let activeUtterance = null;
 let activeAudio = null;
+let activeVoiceButton = null;
 let activeVoiceProgressTimer = null;
 
 
@@ -659,25 +660,33 @@ function extractFirstAnswerSection(answer) {
 async function playAnswerVoice(btn) {
     const text = btn.getAttribute('data-voice-text') || '';
     if (!text) return;
+    if (btn.classList.contains('loading')) return;
 
     if (activeAudio && !activeAudio.paused) {
         activeAudio.pause();
         activeAudio = null;
-        stopVoiceProgress(btn);
-        btn.classList.remove('playing', 'loading', 'error');
+        if (activeVoiceButton) {
+            stopVoiceProgress(activeVoiceButton);
+            activeVoiceButton.classList.remove('playing', 'loading', 'error');
+        }
+        activeVoiceButton = null;
         return;
     }
 
     if (window.speechSynthesis.speaking) {
         window.speechSynthesis.cancel();
         activeUtterance = null;
-        stopVoiceProgress(btn);
-        btn.classList.remove('playing', 'loading', 'error');
+        if (activeVoiceButton) {
+            stopVoiceProgress(activeVoiceButton);
+            activeVoiceButton.classList.remove('playing', 'loading', 'error');
+        }
+        activeVoiceButton = null;
         return;
     }
 
     btn.classList.remove('error');
     if (currentVoice === 'buddi') {
+        activeVoiceButton = btn;
         btn.classList.add('loading');
         startVoiceProgress(btn, text);
         btn.title = currentLang === 'en' ? 'Generating voice...' : '\uc74c\uc131 \uc0dd\uc131 \uc911...';
@@ -703,6 +712,7 @@ async function playAnswerVoice(btn) {
             audio.onended = () => {
                 URL.revokeObjectURL(url);
                 activeAudio = null;
+                activeVoiceButton = null;
                 stopVoiceProgress(btn);
                 btn.classList.remove('playing', 'loading', 'error');
                 btn.title = currentLang === 'en' ? 'Play voice' : '\uc74c\uc131 \ucd9c\ub825';
@@ -710,6 +720,7 @@ async function playAnswerVoice(btn) {
             audio.onerror = () => {
                 URL.revokeObjectURL(url);
                 activeAudio = null;
+                activeVoiceButton = null;
                 stopVoiceProgress(btn);
                 btn.classList.remove('playing', 'loading');
                 btn.classList.add('error');
@@ -722,6 +733,7 @@ async function playAnswerVoice(btn) {
             stopVoiceProgress(btn);
             btn.classList.remove('loading', 'playing');
             btn.classList.add('error');
+            activeVoiceButton = null;
             btn.title = currentLang === 'en' ? 'Buddhi voice failed. Try again.' : '\ubd80\ub514 \uc74c\uc131 \uc0dd\uc131 \uc2e4\ud328. \ub2e4\uc2dc \uc2dc\ub3c4\ud574\uc8fc\uc138\uc694.';
             return;
         }

@@ -1,5 +1,6 @@
 import io
 import os
+import re
 import threading
 import time
 import unicodedata
@@ -31,6 +32,29 @@ def clean_tts_text(text: str) -> str:
         else:
             cleaned.append(char)
     return " ".join("".join(cleaned).split())
+
+
+def split_tts_text(text: str, max_chars: int = 70) -> list[str]:
+    sentences = re.split(r"(?<=[.!?。！？…]|[다요죠까네음함됨임])\s+", text)
+    chunks = []
+    for sentence in sentences:
+        sentence = sentence.strip()
+        if not sentence:
+            continue
+        while len(sentence) > max_chars:
+            split_at = max(
+                sentence.rfind(" ", 0, max_chars),
+                sentence.rfind(",", 0, max_chars),
+                sentence.rfind("，", 0, max_chars),
+                sentence.rfind("、", 0, max_chars),
+            )
+            if split_at < 24:
+                split_at = max_chars
+            chunks.append(sentence[:split_at].strip())
+            sentence = sentence[split_at:].strip()
+        if sentence:
+            chunks.append(sentence)
+    return chunks[:4]
 
 
 def get_tts():
@@ -71,9 +95,24 @@ def synthesize_xtts(text, language):
         top_k=30,
         top_p=0.8,
         do_sample=True,
-        speed=1.06,
+        speed=0.98,
     )
     return result["wav"]
+
+
+def synthesize_chunks(text, language):
+    chunks = split_tts_text(text)
+    if not chunks:
+        chunks = [text]
+
+    wav_parts = []
+    pause = [0.0] * 3600
+    for index, chunk in enumerate(chunks):
+        wav = synthesize_xtts(chunk, language)
+        wav_parts.extend(wav)
+        if index < len(chunks) - 1:
+            wav_parts.extend(pause)
+    return wav_parts
 
 
 def cache_get(key):
@@ -135,7 +174,7 @@ def synthesize():
     if not text:
         return jsonify({"error": "text is required"}), 400
 
-    text = clean_tts_text(text[:220])
+    text = clean_tts_text(text[:180])
     cache_key = (text, language)
     cached = cache_get(cache_key)
     if cached:
@@ -147,7 +186,7 @@ def synthesize():
 
     with _lock:
         try:
-            wav = synthesize_xtts(text, language)
+            wav = synthesize_chunks(text, language)
         except Exception:
             app.logger.exception("Fast XTTS inference failed; falling back to speaker_wav path")
             wav = get_tts().tts(text=text, speaker_wav=REFERENCE_WAV, language=language)

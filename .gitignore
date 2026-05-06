@@ -3,6 +3,10 @@
 __pycache__/
 *.py[cod]
 *.log
+.tts_server.pid
+.backend_server.pid
+.cloudflared.pid
+.tts_stack_state.json
 .vercel/
 .pytest_cache/
 .mypy_cache/

@@ -813,6 +813,15 @@ async def tts(req: TTSRequest, background_tasks: BackgroundTasks):
                 headers={"Content-Disposition": 'inline; filename="mindbuddhi_buddi.wav"'},
             )
         except Exception as exc:
+            allow_fallback = os.getenv("MINDBUDDHI_TTS_FALLBACK", "0").strip().lower() in {
+                "1",
+                "true",
+                "yes",
+                "on",
+            }
+            if not allow_fallback:
+                logger.warning("Local TTS server unavailable: %s", exc)
+                raise HTTPException(status_code=503, detail="Local TTS server unavailable")
             logger.warning("Local TTS server unavailable, falling back to one-shot XTTS: %s", exc)
 
     tts_python = os.getenv(
