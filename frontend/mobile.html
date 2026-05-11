@@ -1,0 +1,142 @@
+﻿<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MindBuddhi — Mobile Connect</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@300;400;600&family=Noto+Sans+KR:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #d5c2ed;
+            --primary-dark: #b8a0d9;
+            --bg-color: #fcfaff;
+            --text-color: #2d3436;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Noto Sans KR', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            overflow: hidden;
+        }
+
+        .container {
+            text-align: center;
+            background: white;
+            padding: 3rem;
+            border-radius: 2rem;
+            box-shadow: 0 20px 40px rgba(213, 194, 237, 0.2);
+            max-width: 450px;
+            width: 90%;
+            position: relative;
+            z-index: 1;
+        }
+
+        .logo-section {
+            margin-bottom: 2rem;
+        }
+
+        .logo-img {
+            width: 60px;
+            height: 60px;
+            margin-bottom: 1rem;
+        }
+
+        h1 {
+            font-family: 'Noto Serif KR', serif;
+            font-size: 1.8rem;
+            margin-bottom: 0.5rem;
+            color: #4a4a4a;
+        }
+
+        p {
+            font-size: 0.95rem;
+            color: #7f8c8d;
+            line-height: 1.6;
+            margin-bottom: 2rem;
+        }
+
+        .qr-wrapper {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 1.5rem;
+            border: 1px solid #f0e6ff;
+            display: inline-block;
+            margin-bottom: 2rem;
+        }
+
+        .qr-img {
+            width: 200px;
+            height: 200px;
+            display: block;
+        }
+
+        .instruction {
+            padding: 1rem;
+            background: #f8f6ff;
+            border-radius: 1rem;
+            font-size: 0.9rem;
+            color: #6c5ce7;
+            font-weight: 500;
+        }
+
+        /* Decorative Orbs */
+        .orb {
+            position: absolute;
+            width: 300px;
+            height: 300px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(213, 194, 237, 0.4) 0%, rgba(213, 194, 237, 0) 70%);
+            z-index: 0;
+            filter: blur(40px);
+        }
+
+        .orb-1 { top: -100px; left: -100px; }
+        .orb-2 { bottom: -100px; right: -100px; }
+
+        .back-link {
+            margin-top: 2rem;
+            display: inline-block;
+            text-decoration: none;
+            color: #9b59b6;
+            font-size: 0.85rem;
+            transition: opacity 0.2s;
+        }
+
+        .back-link:hover { padding-right: 5px; opacity: 0.7; }
+    </style>
+</head>
+<body>
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+
+    <div class="container">
+        <div class="logo-section">
+            <img src="/static/logo.png" alt="MindBuddhi" class="logo-img">
+            <h1>MindBuddhi Mobile</h1>
+            <p>언제 어디서나 마음을 챙기는 지혜로운 습관<br>모바일에서도 MindBuddhi를 만나보세요.</p>
+        </div>
+
+        <div class="qr-wrapper">
+            <img src="/static/qr_mobile.png" alt="QR Code" class="qr-img">
+        </div>
+
+        <div class="instruction">
+            📸 카메라로 사진을 찍어 바로 접속하세요!
+        </div>
+
+        <a href="/" class="back-link">메인으로 돌아가기</a>
+    </div>
+</body>
+</html>
+
