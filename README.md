@@ -4,20 +4,21 @@
   <img src="docs/images/logo.png" width="200" alt="MindBuddhi Logo">
 </p>
 
-![Banner](docs/images/banner.png)
-
-## 🕊️ 당신의 마음을 돌보는 지혜의 동반자
-**MindBuddhi**는 팔만대장경의 방대한 지혜와 현대의 AI 기술을 결합하여, 일상의 고민에 대한 깊이 있는 통찰과 따뜻한 위로를 전하는 **불교 기반 감성 지능 상담 서비스**입니다.
+<p align="center">
+  <img src="docs/images/name_meaning.png" width="600" alt="Name Meaning">
+</p>
 
 ---
 
 ## 🖥️ 서비스 화면 (Service Interface)
 
-![Dashboard](docs/images/dashboard.png)
+![Service Screen](docs/images/service_screen.png)
 
 ---
 
 ## 🌟 4가지 핵심 지혜 모드 (4 Wisdom Modes)
+
+**MindBuddhi**는 팔만대장경의 방대한 지혜와 현대의 AI 기술을 결합하여, 일상의 고민에 대한 깊이 있는 통찰과 따뜻한 위로를 전하는 **불교 기반 감성 지능 상담 서비스**입니다.
 
 ### 1️⃣ 지혜 상담 모드 (Wisdom Chat)
 일상의 스트레스, 인간관계, 자아 성찰 등 당신의 모든 고민을 들어드립니다. 붓다의 자비로운 가르침을 바탕으로 현대인의 마음에 꼭 맞는 따뜻한 위로와 실질적인 조언을 건넵니다.
